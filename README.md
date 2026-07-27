@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Mood-Based Food Recommendation System
 
 AI Mood-Based Food Recommendation System is an enterprise-grade platform for personalized nutrition, wellness, and food recommendations powered by AI. The system blends emotional state detection, dietary preferences, health risk prediction, and contextual recommendation logic to deliver tailored food, recipe, and restaurant suggestions.
@@ -71,3 +72,7 @@ See the `docs/` folder for architecture, API design, system design, ML pipeline,
 ## License
 
 This project is licensed under the MIT License. See `LICENSE`.
+=======
+# moodfood-ai-system
+An AI-powered MoodFood Recommendation System that suggests foods based on the user's mood using Machine Learning, NLP, and Streamlit.
+>>>>>>> 27ebff6ba915dee9590efb951da86bf87557e0f6
