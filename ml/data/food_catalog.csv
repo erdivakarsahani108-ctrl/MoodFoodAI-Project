@@ -1,0 +1,6 @@
+food_id,food_name,cuisine,category,calories,protein,fat,carbs,allergens,region,budget_level,description
+food_001,Masala Dosa,South Indian,Breakfast,150,4,5,24,milk,South India,low,Comforting savory crepe served with coconut chutney
+food_002,Grilled Chicken Salad,Global,Salad,220,28,8,10,,Global,medium,Lean grilled protein with seasonal greens and dressing
+food_003,Paneer Tikka,North Indian,Snacks,320,18,24,8,milk,North India,medium,Spiced paneer cubes cooked with aromatic masalas
+food_004,Mixed Fruit Bowl,International,Snack,140,2,0,36,,Global,low,Fresh fruit platter for a light energy boost
+food_005,Quinoa Bowl,Global,Meal,360,14,12,42,,Global,medium,High-fiber meal with roasted vegetables and dressing

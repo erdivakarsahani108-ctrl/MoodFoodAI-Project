@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-07-27T05:15:57.976344+00:00",
+  "counts": {
+    "foods": 500,
+    "recipes": 200,
+    "restaurants": 200,
+    "indian_dishes": 5000,
+    "international_dishes": 5000,
+    "mood_categories": 100,
+    "emotional_states": 500,
+    "allergies": 1000,
+    "diseases": 1000,
+    "seasonal_categories": 100,
+    "weather_categories": 100,
+    "cuisine_categories": 500,
+    "users": 200,
+    "recommendations": 1000
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "mood_categories": [
+    "Comfort",
+    "Energized",
+    "Relaxed",
+    "Romantic",
+    "Adventurous",
+    "Focused",
+    "Social",
+    "Calm",
+    "Festive",
+    "Nostalgic",
+    "Cheerful",
+    "Comforting",
+    "Sunny",
+    "Cozy",
+    "Motivated",
+    "Happy",
+    "Peaceful",
+    "Spicy",
+    "Sweet",
+    "Savory"
+  ],
+  "emotion_states": [
+    "joyful",
+    "melancholic",
+    "excited",
+    "calm",
+    "anxious",
+    "hopeful",
+    "bored",
+    "nostalgic",
+    "content",
+    "adventurous",
+    "relaxed",
+    "stressed",
+    "playful",
+    "confident",
+    "serene",
+    "optimistic",
+    "grateful",
+    "lonely",
+    "inspired",
+    "tired",
+    "romantic",
+    "curious",
+    "focused",
+    "relieved",
+    "energetic",
+    "pensive",
+    "satisfied",
+    "mellow",
+    "determined"
+  ],
+  "mood_emotion_map": {
+    "Comfort": [
+      "pensive",
+      "serene",
+      "determined",
+      "grateful"
+    ],
+    "Energized": [
+      "hopeful",
+      "romantic",
+      "melancholic",
+      "curious"
+    ],
+    "Relaxed": [
+      "bored",
+      "confident",
+      "tired",
+      "joyful"
+    ],
+    "Romantic": [
+      "playful",
+      "focused",
+      "calm",
+      "relaxed"
+    ],
+    "Adventurous": [
+      "focused",
+      "pensive",
+      "stressed",
+      "melancholic"
+    ],
+    "Focused": [
+      "curious",
+      "satisfied",
+      "hopeful",
+      "playful"
+    ],
+    "Social": [
+      "excited",
+      "nostalgic",
+      "content",
+      "joyful"
+    ],
+    "Calm": [
+      "focused",
+      "tired",
+      "mellow",
+      "optimistic"
+    ],
+    "Festive": [
+      "nostalgic",
+      "excited",
+      "mellow",
+      "anxious"
+    ],
+    "Nostalgic": [
+      "anxious",
+      "pensive",
+      "energetic",
+      "curious"
+    ],
+    "Cheerful": [
+      "melancholic",
+      "satisfied",
+      "focused",
+      "confident"
+    ],
+    "Comforting": [
+      "playful",
+      "serene",
+      "confident",
+      "relaxed"
+    ],
+    "Sunny": [
+      "adventurous",
+      "romantic",
+      "joyful",
+      "relaxed"
+    ],
+    "Cozy": [
+      "nostalgic",
+      "relieved",
+      "romantic",
+      "hopeful"
+    ],
+    "Motivated": [
+      "content",
+      "hopeful",
+      "romantic",
+      "calm"
+    ],
+    "Happy": [
+      "focused",
+      "mellow",
+      "confident",
+      "inspired"
+    ],
+    "Peaceful": [
+      "content",
+      "nostalgic",
+      "relaxed",
+      "focused"
+    ],
+    "Spicy": [
+      "hopeful",
+      "grateful",
+      "relieved",
+      "confident"
+    ],
+    "Sweet": [
+      "excited",
+      "serene",
+      "lonely",
+      "curious"
+    ],
+    "Savory": [
+      "joyful",
+      "stressed",
+      "lonely",
+      "determined"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+food_id,food_name,cuisine,category,calories,protein,fat,carbs,allergens,season,region,budget_level
+1,Masala Dosa,South Indian,Breakfast,150,4,5,24,"egg,milk",All,South India,low
+2,Grilled Chicken Salad,Global,Salad,220,28,8,10,"",All,Global,medium
+3,Paneer Tikka,North Indian,Snacks,320,18,24,8,"milk",Winter,North India,medium

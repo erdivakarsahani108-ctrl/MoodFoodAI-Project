@@ -1,0 +1,6 @@
+age,gender,height_cm,weight_kg,bmi,at_risk
+34,male,176,78,25.2,1
+28,female,162,58,22.1,0
+46,male,170,92,31.8,1
+39,female,158,72,28.8,1
+25,male,180,72,22.2,0

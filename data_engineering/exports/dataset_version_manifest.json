@@ -1,0 +1,62 @@
+{
+  "version": "2026.07.27.051557",
+  "generated_at": "2026-07-27T05:15:57.978298+00:00",
+  "data_dir": "C:\\Users\\Lenovo\\OneDrive\\Desktop\\MoodfoodAI\\data_engineering\\datasets",
+  "exports_dir": "C:\\Users\\Lenovo\\OneDrive\\Desktop\\MoodfoodAI\\data_engineering\\exports",
+  "files": [
+    {
+      "path": "catalog_metadata.json",
+      "size_bytes": 458,
+      "sha256": "1cd87b89ca8e0eed89c8f9f4a25087214915eca867b78de5ce109e5ae891188b",
+      "created_at": "2026-07-27T05:15:57.970671+00:00"
+    },
+    {
+      "path": "food_images.csv",
+      "size_bytes": 6416483,
+      "sha256": "cb8140e02ffb7f5a11dde3abc7d471b0941ccc4593b483e94f32fc98f29e70f4",
+      "created_at": "2026-07-27T05:15:57.442403+00:00"
+    },
+    {
+      "path": "foods.csv",
+      "size_bytes": 143042,
+      "sha256": "26de029628b8def141dc83c7a6d7d3e7148e5fd339bf282558b65f521ce9de06",
+      "created_at": "2026-07-27T05:15:57.480460+00:00"
+    },
+    {
+      "path": "mood_taxonomy.json",
+      "size_bytes": 2866,
+      "sha256": "f093980503cc5f5a1433e28faabbd574e5f1ea07327e18fce4c4623f437500d7",
+      "created_at": "2026-07-27T05:15:57.970671+00:00"
+    },
+    {
+      "path": "recipes.csv",
+      "size_bytes": 186958,
+      "sha256": "f2c9eaebf8073475def8fb5a68268fffb6d0aed22938546c7563b08a571ab414",
+      "created_at": "2026-07-27T05:15:57.772059+00:00"
+    },
+    {
+      "path": "recommendations.csv",
+      "size_bytes": 221302,
+      "sha256": "4080b32ebdbce2b4147caf44ee76128f9a8db94f38de628a65c827d46676b296",
+      "created_at": "2026-07-27T05:15:57.970671+00:00"
+    },
+    {
+      "path": "restaurants.csv",
+      "size_bytes": 68642,
+      "sha256": "4f946999b7be6783ab1d4b2edcb63389d945601609276ea964deb45e5767dce5",
+      "created_at": "2026-07-27T05:15:57.842727+00:00"
+    },
+    {
+      "path": "user_profiles.csv",
+      "size_bytes": 58262,
+      "sha256": "756d8edae3d8f502964ab861eb977411c53a7bfc0775d3badeeed2e1f6992594",
+      "created_at": "2026-07-27T05:15:57.931883+00:00"
+    },
+    {
+      "path": "dataset_version_manifest.json",
+      "size_bytes": 2010,
+      "sha256": "a49193d30ac41efa52b5733eea646e9cea10331880dcad05bcbeb41cbfa92ecb",
+      "created_at": "2026-07-27T05:10:51.662412+00:00"
+    }
+  ]
+}
