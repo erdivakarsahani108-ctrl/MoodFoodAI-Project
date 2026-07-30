@@ -1,4 +1,101 @@
-food_id,food_name,cuisine,category,calories,protein,fat,carbs,allergens,season,region,budget_level
-1,Masala Dosa,South Indian,Breakfast,150,4,5,24,"egg,milk",All,South India,low
-2,Grilled Chicken Salad,Global,Salad,220,28,8,10,"",All,Global,medium
-3,Paneer Tikka,North Indian,Snacks,320,18,24,8,"milk",Winter,North India,medium
+food_id,food_name,category,cuisine,meal_type,calories,protein,fat,carbs,fiber,sugar,sodium,vitamin_a,vitamin_c,calcium,iron,potassium,glycemic_index,is_vegetarian,is_vegan,allergens,recommended_for,avoid_for,mood,season,image_url
+1,Masala Dosa,South Indian,Breakfast,Breakfast,150,4,5,24,3,2,220,120,15,40,2,180,55,Yes,No,Milk,"Weight Loss;Heart Health","Lactose Intolerance",Happy,All,/images/foods/masala_dosa.jpg
+2,Paneer Tikka,North Indian,Snacks,Dinner,320,18,24,8,2,3,350,200,5,250,3,220,30,Yes,No,Milk,"High Protein","High Cholesterol",Energetic,All,/images/foods/paneer_tikka.jpg
+3,Vegetable Khichdi,Indian,Lunch,Lunch,240,8,5,42,6,3,180,180,18,60,3,250,45,Yes,Yes,None,"Diabetes;Digestive Health",None,Relaxed,All,/images/foods/veg_khichdi.jpg
+4,Poha,Indian,Breakfast,Breakfast,180,5,4,32,3,2,180,110,10,25,2,170,50,Yes,Yes,None,"Weight Loss",None,Happy,All,/images/foods/poha.jpg
+5,Idli,South Indian,Breakfast,Breakfast,120,4,1,24,2,1,120,50,2,15,1,100,35,Yes,Yes,None,"Easy Digestion",None,Relaxed,All,/images/foods/idli.jpg
+6,Upma,South Indian,Breakfast,Breakfast,210,6,5,34,3,2,220,90,6,20,2,180,52,Yes,Yes,Gluten,"Balanced Diet",None,Energetic,All,/images/foods/upma.jpg
+7,Rajma Chawal,North Indian,Lunch,Lunch,350,14,6,58,10,3,300,150,12,70,4,450,55,Yes,Yes,None,"Iron Deficiency","Kidney Disease",Energetic,Winter,/images/foods/rajma_chawal.jpg
+8,Chole,North Indian,Lunch,Lunch,310,15,7,46,11,4,280,180,15,80,4,420,48,Yes,Yes,None,"High Protein",None,Happy,Winter,/images/foods/chole.jpg
+9,Oats Porridge,Global,Breakfast,Breakfast,190,7,3,32,5,2,90,80,4,120,2,250,40,Yes,Yes,None,"Diabetes;Weight Loss",None,Calm,All,/images/foods/oats_porridge.jpg
+10,Vegetable Salad,Global,Salad,Lunch,90,3,2,16,5,5,60,250,35,60,2,300,20,Yes,Yes,None,"Heart Health;Weight Loss",None,Fresh,All,/images/foods/vegetable_salad.jpg
+11,Vegetable Pulao,Indian,Lunch,Lunch,280,6,7,46,4,3,220,120,10,35,2,260,52,Yes,Yes,None,"Balanced Diet",None,Happy,All,/images/foods/vegetable_pulao.jpg
+12,Lemon Rice,South Indian,Lunch,Lunch,260,5,6,44,3,2,210,80,12,25,2,180,54,Yes,Yes,None,"Easy Digestion",None,Fresh,Summer,/images/foods/lemon_rice.jpg
+13,Curd Rice,South Indian,Lunch,Lunch,240,7,5,36,2,3,180,90,6,120,1,170,50,Yes,No,Milk,"Digestive Health","Lactose Intolerance",Calm,Summer,/images/foods/curd_rice.jpg
+14,Aloo Paratha,North Indian,Breakfast,Breakfast,320,8,10,48,5,3,350,100,8,60,2,300,62,Yes,No,Gluten,"High Energy","Diabetes",Energetic,Winter,/images/foods/aloo_paratha.jpg
+15,Gobi Paratha,North Indian,Breakfast,Breakfast,290,8,8,45,5,3,320,120,10,70,2,280,58,Yes,No,Gluten,"Balanced Diet",None,Happy,Winter,/images/foods/gobi_paratha.jpg
+16,Methi Paratha,North Indian,Breakfast,Breakfast,270,7,7,42,5,2,280,140,12,65,2,260,55,Yes,No,Gluten,"Diabetes",None,Fresh,Winter,/images/foods/methi_paratha.jpg
+17,Palak Paneer,North Indian,Dinner,Dinner,300,16,20,12,4,2,320,260,18,280,3,450,28,Yes,No,Milk,"Iron Deficiency","High Cholesterol",Relaxed,Winter,/images/foods/palak_paneer.jpg
+18,Shahi Paneer,North Indian,Dinner,Dinner,360,15,28,14,2,3,420,220,8,300,2,280,30,Yes,No,Milk,"Weight Gain","High Cholesterol",Happy,All,/images/foods/shahi_paneer.jpg
+19,Kadai Paneer,North Indian,Dinner,Dinner,310,16,18,16,4,3,340,180,20,260,3,380,32,Yes,No,Milk,"High Protein",None,Energetic,All,/images/foods/kadai_paneer.jpg
+20,Mixed Vegetable Curry,Indian,Dinner,Dinner,190,6,5,24,6,4,220,240,28,80,3,420,35,Yes,Yes,None,"Heart Health",None,Relaxed,All,/images/foods/mixed_vegetable_curry.jpg
+21,Bhindi Masala,Indian,Lunch,Lunch,170,4,6,20,5,3,210,140,18,70,2,300,32,Yes,Yes,None,"Diabetes",None,Calm,Summer,/images/foods/bhindi_masala.jpg
+22,Aloo Gobi,Indian,Lunch,Lunch,210,5,7,30,5,3,220,130,22,60,2,320,48,Yes,Yes,None,"Balanced Diet",None,Happy,Winter,/images/foods/aloo_gobi.jpg
+23,Vegetable Soup,Global,Dinner,Dinner,90,3,2,12,3,3,150,180,24,40,1,250,18,Yes,Yes,None,"Weight Loss",None,Calm,Winter,/images/foods/vegetable_soup.jpg
+24,Tomato Soup,Global,Dinner,Dinner,80,2,2,11,2,3,160,160,30,30,1,220,20,Yes,Yes,None,"Heart Health",None,Relaxed,Winter,/images/foods/tomato_soup.jpg
+25,Moong Dal,Indian,Lunch,Lunch,210,14,2,30,7,2,180,90,8,45,3,380,38,Yes,Yes,None,"High Protein",None,Energetic,All,/images/foods/moong_dal.jpg
+26,Toor Dal,Indian,Lunch,Lunch,220,13,3,32,6,2,190,80,6,40,3,360,42,Yes,Yes,None,"Balanced Diet",None,Happy,All,/images/foods/toor_dal.jpg
+27,Chana Dal,Indian,Lunch,Lunch,240,15,4,34,8,2,200,70,5,50,4,390,40,Yes,Yes,None,"High Protein",None,Energetic,All,/images/foods/chana_dal.jpg
+28,Sambar,South Indian,Lunch,Lunch,160,7,3,22,5,2,240,130,16,50,2,320,35,Yes,Yes,None,"Digestive Health",None,Fresh,All,/images/foods/sambar.jpg
+29,Rasam,South Indian,Lunch,Lunch,70,2,1,10,2,2,180,90,18,20,1,160,15,Yes,Yes,None,"Cold & Cough",None,Calm,Monsoon,/images/foods/rasam.jpg
+30,Coconut Chutney,South Indian,Side,Side,120,2,10,6,3,1,140,40,4,20,1,180,18,Yes,Yes,None,"Healthy Fats",None,Happy,All,/images/foods/coconut_chutney.jpg
+31,Ragi Dosa,South Indian,Breakfast,Breakfast,180,6,3,30,5,1,180,120,8,40,2,220,42,Yes,Yes,None,"Diabetes;Weight Loss",None,Fresh,All,/images/foods/ragi_dosa.jpg
+32,Ragi Idli,South Indian,Breakfast,Breakfast,140,5,2,26,4,1,160,110,6,35,2,200,38,Yes,Yes,None,"Diabetes",None,Calm,All,/images/foods/ragi_idli.jpg
+33,Bajra Roti,Indian,Lunch,Lunch,220,7,3,42,6,1,120,80,5,30,3,250,45,Yes,Yes,None,"Heart Health",None,Energetic,Winter,/images/foods/bajra_roti.jpg
+34,Jowar Roti,Indian,Lunch,Lunch,210,6,3,40,5,1,110,70,5,28,2,240,44,Yes,Yes,None,"Gluten Free",None,Happy,All,/images/foods/jowar_roti.jpg
+35,Whole Wheat Roti,Indian,Lunch,Lunch,120,4,1,22,3,1,90,50,2,15,1,120,48,Yes,Yes,Gluten,"Balanced Diet",None,Relaxed,All,/images/foods/wheat_roti.jpg
+36,Brown Rice,Indian,Lunch,Lunch,215,5,2,45,4,1,10,20,1,20,1,80,50,Yes,Yes,None,"Weight Loss",None,Calm,All,/images/foods/brown_rice.jpg
+37,Jeera Rice,Indian,Lunch,Lunch,230,4,4,42,2,1,180,30,2,18,1,90,55,Yes,Yes,None,"Digestive Health",None,Happy,All,/images/foods/jeera_rice.jpg
+38,Steamed Rice,Indian,Lunch,Lunch,205,4,1,45,1,0,5,10,0,10,1,60,58,Yes,Yes,None,"Easy Digestion",None,Relaxed,All,/images/foods/steamed_rice.jpg
+39,Kadhi,Indian,Lunch,Lunch,180,8,7,18,2,2,240,80,4,160,1,180,35,Yes,No,Milk,"Digestive Health","Lactose Intolerance",Calm,All,/images/foods/kadhi.jpg
+40,Lauki Sabzi,Indian,Dinner,Dinner,90,2,2,14,3,2,120,140,15,35,1,220,20,Yes,Yes,None,"Weight Loss",None,Relaxed,Summer,/images/foods/lauki_sabzi.jpg
+41,Tinda Sabzi,Indian,Dinner,Dinner,95,2,2,15,3,2,130,130,12,30,1,210,22,Yes,Yes,None,"Heart Health",None,Calm,Summer,/images/foods/tinda_sabzi.jpg
+42,Tori Sabzi,Indian,Dinner,Dinner,90,2,2,13,3,2,120,120,15,28,1,200,20,Yes,Yes,None,"Weight Loss",None,Fresh,Summer,/images/foods/tori_sabzi.jpg
+43,Karela Sabzi,Indian,Lunch,Lunch,80,3,2,12,4,1,110,100,18,25,2,230,18,Yes,Yes,None,"Diabetes",None,Energetic,Summer,/images/foods/karela.jpg
+44,Cabbage Sabzi,Indian,Lunch,Lunch,95,3,2,14,4,2,130,160,22,40,2,240,24,Yes,Yes,None,"Weight Loss",None,Happy,Winter,/images/foods/cabbage.jpg
+45,Carrot Beans Sabzi,Indian,Lunch,Lunch,110,3,3,18,5,3,140,240,26,45,2,260,28,Yes,Yes,None,"Eye Health",None,Fresh,Winter,/images/foods/carrot_beans.jpg
+46,Beetroot Curry,Indian,Lunch,Lunch,120,3,2,22,4,5,120,90,8,35,2,280,35,Yes,Yes,None,"Anaemia",None,Happy,Winter,/images/foods/beetroot.jpg
+47,Pumpkin Curry,Indian,Dinner,Dinner,100,2,2,18,3,4,110,260,18,30,1,220,30,Yes,Yes,None,"Vitamin A",None,Relaxed,Autumn,/images/foods/pumpkin.jpg
+48,Green Peas Curry,Indian,Dinner,Dinner,180,8,4,26,6,3,180,90,20,45,2,300,40,Yes,Yes,None,"High Protein",None,Energetic,Winter,/images/foods/green_peas.jpg
+49,Capsicum Curry,Indian,Dinner,Dinner,110,3,3,16,4,3,140,180,60,35,2,250,26,Yes,Yes,None,"Immunity",None,Fresh,All,/images/foods/capsicum.jpg
+50,Vegetable Stew,South Indian,Dinner,Dinner,170,5,6,24,4,2,170,120,18,40,2,260,32,Yes,Yes,None,"Balanced Diet",None,Calm,All,/images/foods/vegetable_stew.jpg
+51,Sprouts Salad,Indian,Salad,Snack,160,10,2,24,8,2,90,120,18,55,3,350,30,Yes,Yes,None,"High Protein;Weight Loss",None,Energetic,All,/images/foods/sprouts_salad.jpg
+52,Cucumber Salad,Indian,Salad,Snack,60,2,1,10,2,2,40,60,10,20,1,180,15,Yes,Yes,None,"Hydration",None,Fresh,Summer,/images/foods/cucumber_salad.jpg
+53,Fruit Salad,Global,Salad,Snack,140,2,1,32,5,18,20,180,45,30,1,320,38,Yes,Yes,None,"Immunity",None,Happy,Summer,/images/foods/fruit_salad.jpg
+54,Roasted Makhana,Indian,Snack,Snack,150,5,3,24,3,1,40,20,1,40,1,120,22,Yes,Yes,None,"Weight Loss",None,Relaxed,All,/images/foods/makhana.jpg
+55,Roasted Chana,Indian,Snack,Snack,180,9,3,28,7,2,60,30,2,45,2,240,28,Yes,Yes,None,"High Protein",None,Energetic,All,/images/foods/roasted_chana.jpg
+56,Peanut Chaat,Indian,Snack,Snack,220,8,12,16,4,2,120,30,4,50,2,280,25,Yes,Yes,Peanuts,"High Protein","Peanut Allergy",Happy,All,/images/foods/peanut_chaat.jpg
+57,Corn Chaat,Indian,Snack,Snack,170,5,2,34,4,4,110,60,12,20,1,220,48,Yes,Yes,None,"Energy",None,Fresh,Monsoon,/images/foods/corn_chaat.jpg
+58,Vegetable Sandwich,Indian,Snack,Snack,240,8,6,36,5,3,280,100,12,60,2,260,50,Yes,No,Gluten,"Balanced Diet",None,Happy,All,/images/foods/veg_sandwich.jpg
+59,Paneer Sandwich,Indian,Snack,Snack,290,14,12,30,4,3,320,120,8,220,2,280,42,Yes,No,"Milk,Gluten","High Protein","High Cholesterol",Energetic,All,/images/foods/paneer_sandwich.jpg
+60,Vegetable Wrap,Indian,Snack,Snack,260,8,6,38,5,3,260,110,14,55,2,270,45,Yes,Yes,Gluten,"Balanced Diet",None,Happy,All,/images/foods/vegetable_wrap.jpg
+61,Vegetable Biryani,Indian,Dinner,Dinner,340,8,8,56,5,3,320,140,12,45,2,310,55,Yes,Yes,None,"Balanced Diet",None,Happy,All,/images/foods/vegetable_biryani.jpg
+62,Paneer Bhurji,Indian,Dinner,Dinner,280,18,18,10,2,2,300,180,6,250,2,220,25,Yes,No,Milk,"High Protein","High Cholesterol",Energetic,All,/images/foods/paneer_bhurji.jpg
+63,Soya Chunks Curry,Indian,Lunch,Lunch,260,24,8,18,6,2,260,120,8,120,4,420,22,Yes,Yes,Soy,"Muscle Gain","Soy Allergy",Energetic,All,/images/foods/soya_chunks.jpg
+64,Tofu Stir Fry,Asian,Dinner,Dinner,220,18,10,12,5,2,180,100,15,220,3,380,20,Yes,Yes,Soy,"High Protein",None,Fresh,All,/images/foods/tofu_stir_fry.jpg
+65,Vegetable Momos,Tibetan,Snack,Snack,190,6,3,34,3,2,260,80,10,25,2,180,48,Yes,Yes,Gluten,"Light Meal",None,Happy,All,/images/foods/veg_momos.jpg
+66,Vegetable Noodles,Chinese,Dinner,Dinner,310,7,9,48,4,3,420,120,18,35,2,240,58,Yes,Yes,Gluten,"Energy",None,Happy,All,/images/foods/veg_noodles.jpg
+67,Hakka Noodles,Chinese,Dinner,Dinner,330,8,10,52,4,3,450,130,18,38,2,250,60,Yes,Yes,Gluten,"Energy",None,Energetic,All,/images/foods/hakka_noodles.jpg
+68,Vegetable Fried Rice,Chinese,Dinner,Dinner,320,7,8,54,3,2,390,110,12,30,2,220,62,Yes,Yes,None,"Energy","Diabetes",Happy,All,/images/foods/veg_fried_rice.jpg
+69,Veg Manchurian,Chinese,Snack,Dinner,290,8,14,32,3,3,520,90,10,28,2,210,56,Yes,Yes,Gluten,"Treat Meal","High BP",Happy,All,/images/foods/veg_manchurian.jpg
+70,Spring Rolls,Chinese,Snack,Snack,270,6,12,34,3,2,360,80,8,22,2,180,58,Yes,Yes,Gluten,"Occasional Treat","Weight Loss",Happy,All,/images/foods/spring_rolls.jpg
+71,Vegetable Pizza,Italian,Dinner,Dinner,360,12,14,46,4,4,480,140,14,180,2,260,60,Yes,No,"Milk,Gluten","Energy","Weight Loss",Happy,All,/images/foods/veg_pizza.jpg
+72,Margherita Pizza,Italian,Dinner,Dinner,340,11,13,44,3,4,470,130,10,200,2,240,58,Yes,No,"Milk,Gluten","Occasional Treat","High Cholesterol",Happy,All,/images/foods/margherita_pizza.jpg
+73,Vegetable Pasta,Italian,Dinner,Dinner,310,9,8,48,4,3,360,110,16,50,2,230,56,Yes,Yes,Gluten,"Balanced Diet",None,Happy,All,/images/foods/veg_pasta.jpg
+74,White Sauce Pasta,Italian,Dinner,Dinner,390,12,18,46,3,4,520,150,8,220,2,250,58,Yes,No,"Milk,Gluten","Energy","High Cholesterol",Happy,All,/images/foods/white_sauce_pasta.jpg
+75,Red Sauce Pasta,Italian,Dinner,Dinner,300,9,7,46,4,4,330,120,18,45,2,220,54,Yes,Yes,Gluten,"Balanced Diet",None,Fresh,All,/images/foods/red_sauce_pasta.jpg
+76,Avocado Salad,Global,Salad,Snack,210,4,18,12,8,1,20,90,14,20,1,480,18,Yes,Yes,None,"Heart Health",None,Calm,All,/images/foods/avocado_salad.jpg
+77,Greek Yogurt Bowl,Global,Breakfast,Breakfast,230,16,6,24,3,8,90,120,8,220,1,260,32,Yes,No,Milk,"High Protein","Lactose Intolerance",Relaxed,All,/images/foods/greek_yogurt_bowl.jpg
+78,Smoothie Bowl,Global,Breakfast,Breakfast,260,6,5,42,6,16,40,180,35,80,2,420,40,Yes,Yes,None,"Immunity",None,Fresh,Summer,/images/foods/smoothie_bowl.jpg
+79,Banana Oat Smoothie,Global,Breakfast,Breakfast,240,8,4,40,5,12,60,100,12,120,2,450,42,Yes,No,Milk,"Workout Recovery","Diabetes",Energetic,All,/images/foods/banana_oat_smoothie.jpg
+80,Green Smoothie,Global,Breakfast,Breakfast,180,5,2,28,6,8,40,220,40,100,3,500,28,Yes,Yes,None,"Detox;Weight Loss",None,Fresh,Summer,/images/foods/green_smoothie.jpg
+81,Apple,Fruit,Indian,Snack,95,0.5,0.3,25,4.4,19,2,54,8,11,0.2,195,36,Yes,Yes,None,"Heart Health;Weight Loss",None,Fresh,All,/images/foods/apple.jpg
+82,Banana,Fruit,Indian,Snack,105,1.3,0.4,27,3.1,14,1,76,10,6,0.3,422,51,Yes,Yes,None,"Energy;Workout Recovery","Diabetes",Energetic,All,/images/foods/banana.jpg
+83,Orange,Fruit,Indian,Snack,62,1.2,0.2,15,3.1,12,0,11,70,52,0.1,237,40,Yes,Yes,None,"Immunity",None,Fresh,Winter,/images/foods/orange.jpg
+84,Papaya,Fruit,Indian,Breakfast,59,0.9,0.4,15,3,8,3,950,61,20,0.3,182,35,Yes,Yes,None,"Digestion;Weight Loss",None,Relaxed,Summer,/images/foods/papaya.jpg
+85,Watermelon,Fruit,Indian,Snack,46,0.9,0.2,11,0.6,9,2,28,12,7,0.2,170,38,Yes,Yes,None,"Hydration",None,Fresh,Summer,/images/foods/watermelon.jpg
+86,Guava,Fruit,Indian,Snack,68,2.6,1,14,5,9,2,31,228,18,0.3,417,24,Yes,Yes,None,"Immunity;Diabetes",None,Happy,Winter,/images/foods/guava.jpg
+87,Pomegranate,Fruit,Indian,Snack,83,1.7,1.2,19,4,14,3,0,10,10,0.3,236,35,Yes,Yes,None,"Heart Health",None,Calm,Winter,/images/foods/pomegranate.jpg
+88,Mango,Fruit,Indian,Snack,99,1.4,0.6,25,3,22,1,1082,36,11,0.2,277,51,Yes,Yes,None,"Vitamin A","Diabetes",Happy,Summer,/images/foods/mango.jpg
+89,Grapes,Fruit,Indian,Snack,104,1.1,0.2,27,1.4,23,3,66,4,10,0.3,288,53,Yes,Yes,None,"Energy","Diabetes",Happy,Summer,/images/foods/grapes.jpg
+90,Pineapple,Fruit,Indian,Snack,82,0.9,0.2,22,2.3,16,2,58,79,21,0.3,180,59,Yes,Yes,None,"Digestion",None,Fresh,Summer,/images/foods/pineapple.jpg
+91,Coconut Water,Beverage,Indian,Drink,45,1.7,0.2,9,1,6,30,0,24,24,0.3,250,30,Yes,Yes,None,"Hydration",None,Relaxed,Summer,/images/foods/coconut_water.jpg
+92,Buttermilk,Beverage,Indian,Drink,40,3,1,5,0,4,90,50,2,120,0.1,150,30,Yes,No,Milk,"Digestion","Lactose Intolerance",Calm,Summer,/images/foods/buttermilk.jpg
+93,Lassi,Beverage,Indian,Drink,180,6,6,24,0,20,100,60,2,180,0.1,220,45,Yes,No,Milk,"Energy","Diabetes",Happy,Summer,/images/foods/lassi.jpg
+94,Almonds,Dry Fruits,Indian,Snack,164,6,14,6,3.5,1,1,1,0,76,1,208,15,Yes,Yes,Tree Nuts,"Brain Health","Nut Allergy",Focused,All,/images/foods/almonds.jpg
+95,Walnuts,Dry Fruits,Indian,Snack,185,4,18,4,2,1,1,1,0,28,0.8,125,15,Yes,Yes,Tree Nuts,"Heart Health","Nut Allergy",Calm,All,/images/foods/walnuts.jpg
+96,Cashews,Dry Fruits,Indian,Snack,157,5,12,9,1,2,3,0,0,10,1.9,187,22,Yes,Yes,Tree Nuts,"Weight Gain","Nut Allergy",Happy,All,/images/foods/cashews.jpg
+97,Raisins,Dry Fruits,Indian,Snack,129,1.4,0.2,34,2,29,5,0,1,27,0.8,320,64,Yes,Yes,None,"Anaemia","Diabetes",Energetic,All,/images/foods/raisins.jpg
+98,Dates,Dry Fruits,Indian,Snack,133,1.1,0.2,36,3,32,1,0,0,18,0.3,330,62,Yes,Yes,None,"Energy","Diabetes",Energetic,All,/images/foods/dates.jpg
+99,Pistachios,Dry Fruits,Indian,Snack,160,6,13,8,3,2,0,14,2,30,1.1,290,15,Yes,Yes,Tree Nuts,"Heart Health","Nut Allergy",Focused,All,/images/foods/pistachios.jpg
+100,Mixed Dry Fruits,Dry Fruits,Indian,Snack,180,5,14,10,3,3,5,10,2,45,1.2,260,20,Yes,Yes,Tree Nuts,"Brain Health","Nut Allergy",Focused,All,/images/foods/mixed_dry_fruits.jpg

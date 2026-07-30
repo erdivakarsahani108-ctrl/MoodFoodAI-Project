@@ -1,7 +1,7 @@
-import Card from "../components/import React from "react";
+import React from "react";
 import Layout from "../components/Layout";
-import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 
 // Types
 interface StatCard {
@@ -489,4 +489,5 @@ const DashboardPage: React.FC = () => {
       </div>
     </Layout>
   );
-};ss
+};
+
