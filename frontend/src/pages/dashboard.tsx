@@ -253,7 +253,7 @@ const DashboardPage: React.FC = () => {
                 <Button variant="primary" className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-2 rounded-full">
                   🍽️ View Full Plan
                 </Button>
-                <Button variant="outline" className="border-2 border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-6 py-2 rounded-full">
+                <Button variant="secondary" className="border-2 border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-6 py-2 rounded-full">
                   📋 Customize
                 </Button>
               </div>
