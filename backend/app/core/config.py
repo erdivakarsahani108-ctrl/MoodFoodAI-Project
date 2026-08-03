@@ -15,7 +15,11 @@ class Settings(BaseSettings):
     project_name: str = "AI Mood-Based Food Recommendation System"
     environment: str = "development"
     debug: bool = True
-    allowed_origins: List[str] = ["http://localhost:3000"]
+    allowed_origins: List[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
+    allowed_origin_regex: str = r"https://.*\.vercel\.app|https://.*\.vercel-preview\.app"
     postgres_dsn: str = "sqlite:///./moodfood.db"
     mongodb_uri: str = "mongodb://localhost:27017/moodfood"
     redis_url: str = "redis://localhost:6379/0"
@@ -29,7 +33,10 @@ class Settings(BaseSettings):
     @classmethod
     def parse_allowed_origins(cls, value):
         if value is None:
-            return ["http://localhost:3000"]
+            return [
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+            ]
         if isinstance(value, str):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
