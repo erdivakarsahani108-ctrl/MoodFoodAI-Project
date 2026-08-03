@@ -61,6 +61,23 @@ Run both backend and frontend together with Docker Compose:
 docker-compose up --build
 ```
 
+## Vercel + Render Connection
+
+For production deployment, host the frontend on Vercel and the backend on Render.
+
+1. In Render, deploy the backend service and copy the public URL, for example:
+   `https://moodfood-api.onrender.com`
+2. In Vercel project settings, add:
+   - `NEXT_PUBLIC_API_BASE_URL=https://moodfood-api.onrender.com/api/v1`
+3. In the Render environment variables, add your frontend domain(s):
+   ```bash
+   ALLOWED_ORIGINS=https://your-project.vercel.app,https://your-project-git-main-your-user.vercel.app
+   ALLOWED_ORIGIN_REGEX=^https://.*\.vercel\.app$|^https://.*\.vercel-preview\.app$
+   ```
+4. Redeploy both services after saving the environment variables.
+
+This allows the Vercel frontend to call the Render backend without CORS errors while still keeping localhost development working.
+
 ## Kubernetes Deployment
 
 Apply the Kubernetes manifests in `infra/k8s` to deploy services in a cluster.
