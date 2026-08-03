@@ -6,11 +6,13 @@ const resolveApiBaseUrl = () => {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'http://localhost:8000/api/v1';
 
-  if (configuredBaseUrl.endsWith('/api/v1')) {
-    return configuredBaseUrl;
+  const normalizedBaseUrl = configuredBaseUrl.trim().replace(/\/+$/, '');
+
+  if (normalizedBaseUrl.endsWith('/api/v1')) {
+    return normalizedBaseUrl;
   }
 
-  return `${configuredBaseUrl.replace(/\/+$/, '')}/api/v1`;
+  return `${normalizedBaseUrl}/api/v1`;
 };
 
 export const API_BASE_URL = resolveApiBaseUrl();

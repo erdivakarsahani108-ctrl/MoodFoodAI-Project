@@ -19,7 +19,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
-    allowed_origin_regex: str = r"https://.*\.vercel\.app|https://.*\.vercel-preview\.app"
+    allowed_origin_regex: str = r"^https://.*\.vercel\.app$|^https://.*\.vercel-preview\.app$"
     postgres_dsn: str = "sqlite:///./moodfood.db"
     mongodb_uri: str = "mongodb://localhost:27017/moodfood"
     redis_url: str = "redis://localhost:6379/0"

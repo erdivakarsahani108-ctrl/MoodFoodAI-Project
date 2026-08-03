@@ -72,7 +72,7 @@ For production deployment, host the frontend on Vercel and the backend on Render
 3. In the Render environment variables, add your frontend domain(s):
    ```bash
    ALLOWED_ORIGINS=https://your-project.vercel.app,https://your-project-git-main-your-user.vercel.app
-   ALLOWED_ORIGIN_REGEX=https://.*\.vercel\.app|https://.*\.vercel-preview\.app
+   ALLOWED_ORIGIN_REGEX=^https://.*\.vercel\.app$|^https://.*\.vercel-preview\.app$
    ```
 4. Redeploy both services after saving the environment variables.
 
