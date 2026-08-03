@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
-import Layout from "../components/Layout";
+﻿import { useRouter } from 'next/router';
+import { useMemo, useState } from 'react';
 
-interface FormData {
+import Layout from '../components/Layout';
+import { pushToast } from '../components/ui/Toast';
+
+interface RegisterForm {
   fullName: string;
   email: string;
   mobile: string;
@@ -11,312 +13,230 @@ interface FormData {
   terms: boolean;
 }
 
-const RegisterPage: React.FC = () => {
+const initialForm: RegisterForm = {
+  fullName: '',
+  email: '',
+  mobile: '',
+  password: '',
+  confirmPassword: '',
+  terms: false,
+};
+
+const RegisterPage = () => {
   const router = useRouter();
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    mobile: "",
-    password: "",
-    confirmPassword: "",
-    terms: false,
-  });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [form, setForm] = useState<RegisterForm>(initialForm);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Password strength calculation
-  const getPasswordStrength = (pwd: string): { score: number; label: string; color: string } => {
+  const passwordStrength = useMemo(() => {
+    const password = form.password;
     let score = 0;
-    if (pwd.length >= 6) score++;
-    if (pwd.length >= 10) score++;
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
-    if (/\d/.test(pwd)) score++;
-    if (/[^a-zA-Z0-9]/.test(pwd)) score++;
-    const labels = ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"];
-    const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
-    return { score, label: labels[score], color: colors[score] };
+
+    if (password.length >= 6) score += 1;
+    if (password.length >= 10) score += 1;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    const labels = ['Very weak', 'Weak', 'Fair', 'Strong', 'Very strong'];
+    const colors = ['bg-rose-500', 'bg-orange-500', 'bg-yellow-500', 'bg-sky-500', 'bg-emerald-500'];
+
+    return {
+      score: Math.min(score, 4),
+      label: labels[Math.min(score, 4)],
+      width: `${((Math.min(score, 4) + 1) / 5) * 100}%`,
+      color: colors[Math.min(score, 4)],
+    };
+  }, [form.password]);
+
+  const handleChange = (field: keyof RegisterForm, value: string | boolean) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    setErrors((current) => ({ ...current, [field]: '' }));
   };
 
-  const strength = getPasswordStrength(formData.password);
+  const validate = () => {
+    const nextErrors: Record<string, string> = {};
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    // Clear field-specific error on change
-    if (errors[name as keyof FormData]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
+    if (!form.email.trim()) nextErrors.email = 'Email is required.';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) nextErrors.email = 'Please enter a valid email.';
+    if (!form.mobile.trim()) nextErrors.mobile = 'Mobile number is required.';
+    else if (!/^\d{10}$/.test(form.mobile)) nextErrors.mobile = 'Use a valid 10-digit mobile number.';
+    if (!form.password) nextErrors.password = 'Password is required.';
+    else if (form.password.length < 6) nextErrors.password = 'Password must be at least 6 characters.';
+    if (!form.confirmPassword) nextErrors.confirmPassword = 'Please confirm your password.';
+    else if (form.confirmPassword !== form.password) nextErrors.confirmPassword = 'Passwords do not match.';
+    if (!form.terms) nextErrors.terms = 'You must accept the terms to continue.';
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!validate()) {
+      return;
     }
-  };
 
-  const validate = (): boolean => {
-    const newErrors: Partial<FormData> = {};
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
-    if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    else if (!/^[0-9]{10}$/.test(formData.mobile)) newErrors.mobile = "Mobile must be 10 digits";
-    if (!formData.password.trim()) newErrors.password = "Password is required";
-    else if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    if (formData.confirmPassword !== formData.password)
-      newErrors.confirmPassword = "Passwords do not match";
-    if (!formData.terms) newErrors.terms = "You must accept the terms";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setLoading(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setApiError("");
-    setSuccessMessage("");
-    if (!validate()) return;
-
-    setIsLoading(true);
-
-    // Simulate registration
-    setTimeout(() => {
-      // Check if user already exists
-      const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      if (existingUsers.some((u: any) => u.email === formData.email)) {
-        setApiError("User with this email already exists");
-        setIsLoading(false);
-        return;
-      }
-
-      // Save user
-      const newUser = {
-        fullName: formData.fullName,
-        email: formData.email,
-        mobile: formData.mobile,
-        password: formData.password, // In real app, hash this
-      };
-      localStorage.setItem("users", JSON.stringify([...existingUsers, newUser]));
-      setSuccessMessage("Registration successful! Redirecting to login...");
-      setIsLoading(false);
-      setTimeout(() => router.push("/login"), 1500);
-    }, 1000);
+    try {
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
+      pushToast('Account created', 'Your profile has been successfully created.', 'success');
+      void router.push('/login');
+    } catch {
+      pushToast('Registration failed', 'Please verify your details and try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Layout>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-teal-100 to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white/30 dark:bg-gray-800/40 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/30 transition-all duration-300 hover:shadow-3xl">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white">
-                🥗 Create Account
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                Join our health community
-              </p>
+      <div className="mx-auto flex min-h-[80vh] max-w-6xl items-center justify-center py-10">
+        <div className="grid w-full max-w-5xl overflow-hidden rounded-[32px] border border-slate-200 bg-white/80 shadow-soft backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/80 lg:grid-cols-2">
+          <div className="hidden bg-gradient-to-br from-violet-500 via-indigo-500 to-sky-500 p-10 text-white lg:flex lg:flex-col lg:justify-between">
+            <div>
+              <div className="text-sm font-semibold uppercase tracking-[0.24em] text-violet-100">Join MoodFood AI</div>
+              <h1 className="mt-6 text-4xl font-black leading-tight">Start your smarter nutrition journey.</h1>
+            </div>
+            <div className="rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
+              <div className="text-2xl font-bold">4.9/5</div>
+              <div className="mt-2 text-sm text-violet-100">Average member satisfaction</div>
+            </div>
+          </div>
+
+          <div className="p-6 sm:p-10">
+            <div className="mb-8 text-center">
+              <div className="text-4xl">✨</div>
+              <h2 className="mt-3 text-3xl font-black text-slate-900 dark:text-white">Create account</h2>
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Build a healthier daily routine with AI support.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Full Name */}
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">👤</span>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="John Doe"
-                  />
-                </div>
-                {errors.fullName && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.fullName}</p>}
+                <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Full name</label>
+                <input
+                  id="fullName"
+                  value={form.fullName}
+                  onChange={(event) => handleChange('fullName', event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+                  placeholder="Aarav Sharma"
+                />
+                {errors.fullName && <div className="mt-1 text-xs text-rose-600 dark:text-rose-300">{errors.fullName}</div>}
               </div>
 
-              {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">📧</span>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="you@example.com"
-                  />
-                </div>
-                {errors.email && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.email}</p>}
+                <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => handleChange('email', event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+                  placeholder="you@example.com"
+                />
+                {errors.email && <div className="mt-1 text-xs text-rose-600 dark:text-rose-300">{errors.email}</div>}
               </div>
 
-              {/* Mobile */}
               <div>
-                <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Mobile Number
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">📱</span>
-                  <input
-                    id="mobile"
-                    name="mobile"
-                    type="tel"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="9876543210"
-                  />
-                </div>
-                {errors.mobile && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.mobile}</p>}
+                <label htmlFor="mobile" className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Mobile</label>
+                <input
+                  id="mobile"
+                  type="tel"
+                  value={form.mobile}
+                  onChange={(event) => handleChange('mobile', event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+                  placeholder="9876543210"
+                />
+                {errors.mobile && <div className="mt-1 text-xs text-rose-600 dark:text-rose-300">{errors.mobile}</div>}
               </div>
 
-              {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Password
-                </label>
+                <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Password</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">🔒</span>
                   <input
                     id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-12 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={(event) => handleChange('password', event.target.value)}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-800 outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    aria-label="Toggle password visibility"
+                    onClick={() => setShowPassword((current) => !current)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-slate-400"
                   >
-                    {showPassword ? "🙈" : "👁️"}
+                    {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
-                {formData.password && (
+                {form.password && (
                   <div className="mt-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${strength.color} transition-all duration-300`}
-                          style={{ width: `${(strength.score / 5) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-600 dark:text-gray-300">{strength.label}</span>
+                    <div className="mb-1 flex justify-between text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                      <span>Password strength</span>
+                      <span>{passwordStrength.label}</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700">
+                      <div className={`h-2 rounded-full ${passwordStrength.color}`} style={{ width: passwordStrength.width }} />
                     </div>
                   </div>
                 )}
-                {errors.password && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.password}</p>}
+                {errors.password && <div className="mt-1 text-xs text-rose-600 dark:text-rose-300">{errors.password}</div>}
               </div>
 
-              {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Confirm Password
-                </label>
+                <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Confirm password</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">🔐</span>
                   <input
                     id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-12 py-3 bg-white/50 dark:bg-gray-700/50 backdrop-blur-sm border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent outline-none transition text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={form.confirmPassword}
+                    onChange={(event) => handleChange('confirmPassword', event.target.value)}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-800 outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                    aria-label="Toggle confirm password visibility"
+                    onClick={() => setShowConfirmPassword((current) => !current)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-slate-400"
                   >
-                    {showConfirmPassword ? "🙈" : "👁️"}
+                    {showConfirmPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <div className="mt-1 text-xs text-rose-600 dark:text-rose-300">{errors.confirmPassword}</div>}
               </div>
 
-              {/* Terms */}
-              <div className="flex items-start gap-2">
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-950">
                 <input
-                  id="terms"
-                  name="terms"
                   type="checkbox"
-                  checked={formData.terms}
-                  onChange={handleChange}
-                  className="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500"
+                  checked={form.terms}
+                  onChange={(event) => handleChange('terms', event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
-                <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
-                  I accept the{" "}
-                  <a href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline" onClick={(e) => e.preventDefault()}>
-                    Terms & Conditions
-                  </a>
-                  {" "}and{" "}
-                  <a href="#" className="text-indigo-600 dark:text-indigo-400 hover:underline" onClick={(e) => e.preventDefault()}>
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-              {errors.terms && <p className="mt-1 text-sm text-red-500 dark:text-red-400">{errors.terms}</p>}
+                <span className="text-sm text-slate-600 dark:text-slate-300">I agree to the terms of service and privacy policy.</span>
+              </label>
+              {errors.terms && <div className="text-xs text-rose-600 dark:text-rose-300">{errors.terms}</div>}
 
-              {/* Messages */}
-              {apiError && (
-                <div className="text-red-500 dark:text-red-400 text-sm text-center bg-red-100/50 dark:bg-red-900/30 p-2 rounded-lg">
-                  {apiError}
-                </div>
-              )}
-              {successMessage && (
-                <div className="text-green-600 dark:text-green-400 text-sm text-center bg-green-100/50 dark:bg-green-900/30 p-2 rounded-lg">
-                  {successMessage}
-                </div>
-              )}
-
-              {/* Register Button */}
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={loading}
+                className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-violet-500 to-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/20 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-80"
               >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
+                {loading ? 'Creating account...' : 'Create account'}
               </button>
             </form>
 
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white/30 dark:bg-gray-800/40 backdrop-blur-sm text-gray-500 dark:text-gray-400">
-                  Already have an account?
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => router.push("/login")}
-              className="w-full py-3 px-4 bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm hover:bg-white/80 dark:hover:bg-gray-600/80 text-gray-800 dark:text-white font-medium rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200"
-            >
-              🔐 Sign In Instead
-            </button>
+            <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+              Already have an account?{' '}
+              <button type="button" onClick={() => void router.push('/login')} className="font-semibold text-cyan-600 dark:text-cyan-400">
+                Sign in
+              </button>
+            </p>
           </div>
         </div>
       </div>
@@ -324,3 +244,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
+export default RegisterPage;

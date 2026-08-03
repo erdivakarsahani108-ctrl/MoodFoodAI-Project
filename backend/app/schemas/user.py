@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import Dict, List, Optional
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class HealthMetrics(BaseModel):
@@ -35,6 +36,8 @@ class UserUpdate(BaseModel):
 
 
 class UserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     email: str
     full_name: str
@@ -44,6 +47,3 @@ class UserResponse(BaseModel):
     roles: List[str]
     health_metrics: Optional[HealthMetrics]
     preferences: Optional[UserPreferences]
-
-    class Config:
-        orm_mode = True

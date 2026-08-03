@@ -1,31 +1,95 @@
-import axios from 'axios';
+﻿import axios from 'axios';
+
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+apiClient.interceptors.request.use((config) => {
+  if (typeof window === 'undefined') {
+    return config;
+  }
+
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    if (config.headers && typeof (config.headers as any).set === 'function') {
+      (config.headers as any).set('Authorization', `Bearer ${token}`);
+    } else {
+      config.headers = {
+        ...(config.headers ?? {}),
+        Authorization: `Bearer ${token}`,
+      } as any;
+    }
+  }
+
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('guest_mode');
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  },
+);
+
+export const setAuthToken = (token: string | null) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  if (token) {
+    localStorage.setItem('auth_token', token);
+    return;
+  }
+
+  localStorage.removeItem('auth_token');
+};
+
+export const getAuthToken = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return localStorage.getItem('auth_token');
+};
+
+export const isGuestMode = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return localStorage.getItem('guest_mode') === 'true';
+};
 
 export const login = async (email: string, password: string) => {
   const response = await apiClient.post('/auth/login', { email, password });
   return response.data;
 };
 
-export const register = async (email: string, password: string, full_name: string, preferred_language: string) => {
+export const register = async (fullName: string, email: string, mobile: string, password: string) => {
   const response = await apiClient.post('/auth/register', {
+    fullName,
     email,
+    mobile,
     password,
-    full_name,
-    preferred_language,
   });
+
   return response.data;
 };
 
-export const fetchUserProfile = async (token: string) => {
-  const response = await apiClient.get('/users/me', {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const fetchUserProfile = async () => {
+  const response = await apiClient.get('/users/me');
   return response.data;
 };
 

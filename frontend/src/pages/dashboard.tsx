@@ -1,493 +1,458 @@
-import React from "react";
-import Layout from "../components/Layout";
-import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
+﻿import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
-// Types
-interface StatCard {
-  id: string;
-  title: string;
-  value: string | number;
-  icon: string;
-  trend?: string;
-  trendUp?: boolean;
-  color: string;
-}
+import Layout from '../components/Layout';
+import { pushToast } from '../components/ui/Toast';
+import {
+  aiInsights,
+  favoriteFoods,
+  nutritionDistribution,
+  moodTrend,
+  orderHistory,
+  recentActivity,
+  recommendedFoods,
+  recommendedRecipes,
+  recommendedRestaurants,
+  savedPlans,
+  statCards,
+  waterIntake,
+  weeklyCalories,
+} from '../lib/dashboard-data';
 
-interface NutritionProgress {
-  id: string;
-  label: string;
-  value: number;
-  max: number;
-  unit: string;
-  emoji: string;
-  color: string;
-}
-
-interface HealthSummary {
-  bmi: number;
-  bmr: number;
-  bodyFat: number;
-  weight: number;
-  goal: string;
-}
-
-interface WeeklyMood {
-  day: string;
-  mood: string;
-  emoji: string;
-}
-
-interface RecentActivity {
-  id: string;
-  time: string;
-  description: string;
-  icon: string;
-}
-
-interface MealPlan {
-  day: string;
-  meals: string[];
-}
-
-interface HealthTip {
-  id: string;
-  text: string;
-  icon: string;
-}
-
-interface Suggestion {
-  id: string;
-  text: string;
-}
-
-interface DiseaseRisk {
-  condition: string;
-  risk: string;
-  emoji: string;
-}
-
-interface FavoriteFood {
-  id: string;
-  name: string;
-  emoji: string;
-}
-
-interface RecentlyViewed {
-  id: string;
-  name: string;
-  emoji: string;
-}
-
-// Dummy data
-const stats: StatCard[] = [
-  { id: "health-score", title: "Health Score", value: "86", icon: "💪", trend: "+4%", trendUp: true, color: "from-green-400 to-emerald-500" },
-  { id: "calories", title: "Calories Today", value: "1,845", icon: "🔥", trend: "-120", trendUp: false, color: "from-orange-400 to-red-500" },
-  { id: "protein", title: "Protein", value: "82g", icon: "🥩", trend: "+12g", trendUp: true, color: "from-blue-400 to-indigo-500" },
-  { id: "water", title: "Water Intake", value: "2.1L", icon: "💧", trend: "+0.3L", trendUp: true, color: "from-cyan-400 to-blue-500" },
-  { id: "bmi", title: "BMI", value: "22.4", icon: "⚖️", trend: "-0.3", trendUp: false, color: "from-purple-400 to-pink-500" },
-  { id: "mood", title: "Mood", value: "Happy", icon: "😊", trend: "😌", trendUp: true, color: "from-yellow-400 to-orange-500" },
-  { id: "sleep", title: "Sleep", value: "7.2h", icon: "😴", trend: "+0.5h", trendUp: true, color: "from-indigo-400 to-violet-500" },
-  { id: "disease-risk", title: "Disease Risk", value: "Low", icon: "🛡️", trend: "↓", trendUp: true, color: "from-red-400 to-rose-500" },
+const sidebarItems = [
+  { label: 'Overview', icon: '🏠', active: true },
+  { label: 'AI Recommendations', icon: '✨' },
+  { label: 'Nutrition', icon: '🥗' },
+  { label: 'Favorites', icon: '💙' },
+  { label: 'Orders', icon: '🧾' },
+  { label: 'Settings', icon: '⚙️' },
 ];
 
-const nutritionProgress: NutritionProgress[] = [
-  { id: "water", label: "Water", value: 2.1, max: 3, unit: "L", emoji: "💧", color: "bg-cyan-500" },
-  { id: "calories", label: "Calories", value: 1845, max: 2200, unit: "kcal", emoji: "🔥", color: "bg-orange-500" },
-  { id: "protein", label: "Protein", value: 82, max: 120, unit: "g", emoji: "🥩", color: "bg-blue-500" },
-  { id: "fiber", label: "Fiber", value: 28, max: 40, unit: "g", emoji: "🌾", color: "bg-green-500" },
-];
+const getCurrentDate = () =>
+  new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
-const weeklyMood: WeeklyMood[] = [
-  { day: "Mon", mood: "Good", emoji: "😊" },
-  { day: "Tue", mood: "Great", emoji: "😄" },
-  { day: "Wed", mood: "Okay", emoji: "😐" },
-  { day: "Thu", mood: "Happy", emoji: "😃" },
-  { day: "Fri", mood: "Tired", emoji: "😩" },
-  { day: "Sat", mood: "Relaxed", emoji: "😌" },
-  { day: "Sun", mood: "Energetic", emoji: "⚡" },
-];
+const DashboardPage = () => {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-const aiAnalytics = [
-  { id: "nutrition", label: "Nutrition", value: "85%", emoji: "🥗", color: "from-green-400 to-emerald-500" },
-  { id: "sleep", label: "Sleep", value: "78%", emoji: "🛌", color: "from-indigo-400 to-purple-500" },
-  { id: "hydration", label: "Hydration", value: "70%", emoji: "💦", color: "from-cyan-400 to-blue-500" },
-  { id: "stress", label: "Stress", value: "Low", emoji: "🧘", color: "from-yellow-400 to-orange-500" },
-  { id: "exercise", label: "Exercise", value: "65%", emoji: "🏃", color: "from-red-400 to-pink-500" },
-];
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-const recentActivities: RecentActivity[] = [
-  { id: "1", time: "10:30 AM", description: "Logged breakfast: Oatmeal with berries", icon: "🥣" },
-  { id: "2", time: "12:15 PM", description: "Completed 30 min yoga session", icon: "🧘" },
-  { id: "3", time: "2:00 PM", description: "Drank 500ml water", icon: "💧" },
-  { id: "4", time: "6:45 PM", description: "Dinner: Grilled tofu salad", icon: "🥗" },
-];
+    const hasToken = Boolean(localStorage.getItem('auth_token'));
+    const guestMode = localStorage.getItem('guest_mode') === 'true';
+    setIsAuthenticated(hasToken || guestMode);
+  }, []);
 
-const weeklyMealPlan: MealPlan[] = [
-  { day: "Monday", meals: ["Oatmeal", "Quinoa Salad", "Lentil Soup"] },
-  { day: "Tuesday", meals: ["Smoothie", "Veggie Wrap", "Chickpea Curry"] },
-  { day: "Wednesday", meals: ["Avocado Toast", "Falafel Bowl", "Stir-fry Tofu"] },
-  { day: "Thursday", meals: ["Fruit Salad", "Hummus Plate", "Pasta Primavera"] },
-  { day: "Friday", meals: ["Granola", "Sushi Rolls", "Veggie Burger"] },
-  { day: "Saturday", meals: ["Pancakes", "Burrito Bowl", "Pizza Margherita"] },
-  { day: "Sunday", meals: ["Eggs", "Grilled Veggies", "Roasted Potatoes"] },
-];
+  const ensureAuth = (path: string, action: string) => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-const healthTips: HealthTip[] = [
-  { id: "1", text: "Drink 8 glasses of water daily", icon: "💧" },
-  { id: "2", text: "Eat a rainbow of fruits and vegetables", icon: "🌈" },
-  { id: "3", text: "Get 7-9 hours of quality sleep", icon: "😴" },
-  { id: "4", text: "Practice mindful eating", icon: "🧠" },
-];
+    const hasToken = Boolean(localStorage.getItem('auth_token'));
+    const guestMode = localStorage.getItem('guest_mode') === 'true';
 
-const aiSuggestions: Suggestion[] = [
-  { id: "1", text: "Try a high-protein breakfast for sustained energy" },
-  { id: "2", text: "Increase fiber intake with more leafy greens" },
-  { id: "3", text: "Consider a 20-minute walk after lunch" },
-];
+    if (!hasToken && !guestMode) {
+      pushToast('Authentication required', `Please sign in to ${action.toLowerCase()}.`, 'error');
+      void router.push('/login');
+      return;
+    }
 
-const diseaseRisks: DiseaseRisk[] = [
-  { condition: "Diabetes", risk: "Low", emoji: "🩸" },
-  { condition: "Heart Disease", risk: "Moderate", emoji: "❤️" },
-  { condition: "Hypertension", risk: "Low", emoji: "🫀" },
-];
+    void router.push(path);
+  };
 
-const favoriteFoods: FavoriteFood[] = [
-  { id: "1", name: "Avocado Toast", emoji: "🥑" },
-  { id: "2", name: "Quinoa Bowl", emoji: "🍚" },
-  { id: "3", name: "Berry Smoothie", emoji: "🍓" },
-  { id: "4", name: "Tofu Stir-fry", emoji: "🍲" },
-];
+  const handleSavePlan = () => {
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-const recentlyViewed: RecentlyViewed[] = [
-  { id: "1", name: "Chickpea Curry", emoji: "🍛" },
-  { id: "2", name: "Veggie Wrap", emoji: "🌯" },
-  { id: "3", name: "Oatmeal", emoji: "🥣" },
-  { id: "4", name: "Pasta Primavera", emoji: "🍝" },
-];
+    const hasToken = Boolean(localStorage.getItem('auth_token'));
+    const guestMode = localStorage.getItem('guest_mode') === 'true';
 
-// Helper function to get current date
-const getCurrentDate = (): string => {
-  const now = new Date();
-  return now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-};
+    if (!hasToken && !guestMode) {
+      pushToast('Save unavailable', 'Please sign in to save your plan.', 'info');
+      void router.push('/login');
+      return;
+    }
 
-const DashboardPage: React.FC = () => {
-  const currentDate = getCurrentDate();
+    pushToast('Plan saved', 'Your personalized dashboard plan has been saved.', 'success');
+  };
+
+  const maxCalories = Math.max(...weeklyCalories.map((item) => item.value));
+  const moodPath = moodTrend
+    .map((item, index) => `${index === 0 ? 'M' : 'L'} ${55 + index * 72} ${120 - item.value / 2}`)
+    .join(' ');
 
   return (
     <Layout>
-      <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        {/* 1. Welcome Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-              👋 Welcome back, User!
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-1">{currentDate}</p>
-          </div>
-          <div className="mt-4 md:mt-0">
-            <div className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg flex items-center gap-2">
-              <span>🧠</span>
-              <span className="font-medium">AI Health Summary: 86% Optimal</span>
+      <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)]">
+        <aside className="rounded-[28px] bg-slate-950 p-5 text-white shadow-soft">
+          <div className="flex items-center justify-between">
+            <div className="text-xl font-bold">MoodFood AI</div>
+            <div className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+              {isAuthenticated ? 'Logged in' : 'Guest mode'}
             </div>
           </div>
-        </div>
 
-        {/* 2. Statistics Cards (8 cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          {stats.map((stat) => (
-            <Card
-              key={stat.id}
-              className={`bg-gradient-to-br ${stat.color} text-white p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1 duration-300 backdrop-blur-sm bg-opacity-90`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm opacity-80">{stat.title}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                </div>
-                <div className="text-3xl">{stat.icon}</div>
-              </div>
-              {stat.trend && (
-                <div className="mt-2 text-xs flex items-center gap-1">
-                  <span>{stat.trendUp ? "📈" : "📉"}</span>
-                  <span className="opacity-80">{stat.trend}</span>
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-
-        {/* 3. Daily Recommendation Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                🤖 AI Recommended Foods
-              </h2>
-              <div className="flex flex-wrap gap-4 mb-4">
-                <span className="px-4 py-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 rounded-full">🥑 Avocado Toast</span>
-                <span className="px-4 py-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 rounded-full">🥗 Quinoa Salad</span>
-                <span className="px-4 py-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 rounded-full">🍲 Lentil Soup</span>
-                <span className="px-4 py-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 rounded-full">🍣 Veggie Sushi</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <span className="block text-gray-500 dark:text-gray-400">Calories</span>
-                  <span className="text-lg font-bold text-gray-800 dark:text-white">1,845</span>
-                </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <span className="block text-gray-500 dark:text-gray-400">Protein</span>
-                  <span className="text-lg font-bold text-gray-800 dark:text-white">82g</span>
-                </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <span className="block text-gray-500 dark:text-gray-400">Carbs</span>
-                  <span className="text-lg font-bold text-gray-800 dark:text-white">210g</span>
-                </div>
-                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <span className="block text-gray-500 dark:text-gray-400">Fiber</span>
-                  <span className="text-lg font-bold text-gray-800 dark:text-white">28g</span>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Button variant="primary" className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-2 rounded-full">
-                  🍽️ View Full Plan
-                </Button>
-                <Button variant="secondary" className="border-2 border-green-500 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 px-6 py-2 rounded-full">
-                  📋 Customize
-                </Button>
-              </div>
-            </Card>
+          <div className="mt-8 space-y-2">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.label}
+                type="button"
+                className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-medium transition ${item.active ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
           </div>
 
-          {/* 4. Nutrition Progress */}
-          <div className="lg:col-span-1">
-            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 h-full">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-                📊 Nutrition Progress
-              </h2>
-              <div className="space-y-5">
-                {nutritionProgress.map((item) => (
-                  <div key={item.id}>
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
-                      <span>{item.emoji} {item.label}</span>
-                      <span>{item.value}{item.unit} / {item.max}{item.unit}</span>
+          <div className="mt-8 rounded-[24px] bg-gradient-to-br from-emerald-500 to-cyan-500 p-4 text-white shadow-lg shadow-emerald-500/20">
+            <div className="text-xs uppercase tracking-[0.2em] text-emerald-100">AI insight</div>
+            <div className="mt-2 text-2xl font-black">89%</div>
+            <div className="mt-2 text-sm text-emerald-50">Your current wellness score is trending upward.</div>
+          </div>
+        </aside>
+
+        <div className="space-y-6">
+          <motion.header
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft backdrop-blur-xl dark:border-slate-700 dark:bg-slate-900/80"
+          >
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-sm uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">{getCurrentDate()}</div>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900 dark:text-white">Welcome back, Aarav.</h1>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={handleSavePlan}
+                  className="rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20"
+                >
+                  Save plan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => ensureAuth('/favorites', 'Favorites')}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+                >
+                  View favorites
+                </button>
+              </div>
+            </div>
+          </motion.header>
+
+          <motion.section
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+          >
+            {statCards.map((card) => (
+              <div key={card.id} className={`rounded-[28px] bg-gradient-to-br ${card.gradient} p-[1px] shadow-soft`}>
+                <div className="h-full rounded-[27px] bg-slate-950/95 p-5 text-white backdrop-blur-xl">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="text-sm text-slate-200">{card.title}</div>
+                      <div className="mt-3 text-3xl font-black">{card.value}</div>
                     </div>
-                    <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${item.color} rounded-full transition-all duration-500`}
-                        style={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
-                      />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-2xl">{card.icon}</div>
+                  </div>
+                  <div className="mt-4 flex items-center gap-2 text-sm">
+                    <span className={card.positive ? 'text-emerald-300' : 'text-rose-300'}>{card.positive ? '↗' : '↘'}</span>
+                    <span className="text-slate-200">{card.change}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08 }}
+            className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]"
+          >
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">AI food recommendations</h2>
+                <button type="button" onClick={() => ensureAuth('/favorites', 'Favorites')} className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">
+                  See all
+                </button>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {recommendedFoods.map((food) => (
+                  <div key={food.id} className={`rounded-[24px] bg-gradient-to-br ${food.accent} p-[1px]`}>
+                    <div className="h-full rounded-[23px] bg-white/90 p-4 dark:bg-slate-950/90">
+                      <div className="flex items-center justify-between">
+                        <div className="text-3xl">{food.emoji}</div>
+                        <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          {food.mood}
+                        </span>
+                      </div>
+                      <div className="mt-4 text-lg font-bold text-slate-900 dark:text-white">{food.name}</div>
+                      <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">{food.subtitle}</div>
+                      <div className="mt-4 flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
+                        <span>{food.calories}</span>
+                        <span>{food.protein}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* 5. Health Summary + 6. Weekly Mood History */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">🩺 Health Summary</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl text-center">
-                <span className="block text-sm text-gray-500 dark:text-gray-400">BMI</span>
-                <span className="text-xl font-bold text-gray-800 dark:text-white">22.4</span>
-              </div>
-              <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl text-center">
-                <span className="block text-sm text-gray-500 dark:text-gray-400">BMR</span>
-                <span className="text-xl font-bold text-gray-800 dark:text-white">1,650</span>
-              </div>
-              <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl text-center">
-                <span className="block text-sm text-gray-500 dark:text-gray-400">Body Fat</span>
-                <span className="text-xl font-bold text-gray-800 dark:text-white">18%</span>
-              </div>
-              <div className="p-3 bg-white/50 dark:bg-gray-800/50 rounded-xl text-center">
-                <span className="block text-sm text-gray-500 dark:text-gray-400">Weight</span>
-                <span className="text-xl font-bold text-gray-800 dark:text-white">68 kg</span>
-              </div>
             </div>
-            <div className="mt-4 p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
-              <p className="text-sm text-green-800 dark:text-green-200">🎯 Goal: Maintain current weight & build muscle</p>
-            </div>
-          </Card>
 
-          <Card className="p-6 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">📅 Weekly Mood History</h2>
-            <div className="flex justify-between">
-              {weeklyMood.map((day) => (
-                <div key={day.day} className="text-center">
-                  <div className="text-3xl">{day.emoji}</div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{day.day}</div>
+            <div className="space-y-6">
+              <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Recommended recipes</h3>
+                <div className="mt-4 space-y-3">
+                  {recommendedRecipes.map((recipe) => (
+                    <div key={recipe.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 text-xl">{recipe.emoji}</div>
+                        <div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{recipe.name}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">{recipe.time} • {recipe.difficulty}</div>
+                        </div>
+                      </div>
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{recipe.calories}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Nearby healthy spots</h3>
+                <div className="mt-4 space-y-3">
+                  {recommendedRestaurants.map((restaurant) => (
+                    <div key={restaurant.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl">{restaurant.emoji}</div>
+                        <div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{restaurant.name}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">{restaurant.category} • {restaurant.distance}</div>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">{restaurant.rating}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </Card>
-        </div>
+          </motion.section>
 
-        {/* 7. AI Health Analytics */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">📈 AI Health Analytics</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {aiAnalytics.map((item) => (
-              <Card
-                key={item.id}
-                className={`bg-gradient-to-br ${item.color} text-white p-4 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:-translate-y-1 duration-300 text-center`}
-              >
-                <div className="text-3xl mb-1">{item.emoji}</div>
-                <p className="font-medium">{item.label}</p>
-                <p className="text-sm opacity-90">{item.value}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.12 }}
+            className="grid gap-6 xl:grid-cols-2"
+          >
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Weekly calories</h3>
+                <span className="text-sm text-emerald-600 dark:text-emerald-400">On target</span>
+              </div>
+              <svg viewBox="0 0 560 220" className="h-52 w-full">
+                {weeklyCalories.map((day, index) => {
+                  const barHeight = (day.value / maxCalories) * 135;
+                  const x = 30 + index * 72;
+                  return (
+                    <g key={day.day}>
+                      <rect x={x} y={190 - barHeight} width={36} height={barHeight} rx={12} fill="url(#barGradient)" />
+                      <text x={x + 18} y={210} textAnchor="middle" fontSize="12" fill="#94a3b8">{day.day}</text>
+                    </g>
+                  );
+                })}
+                <defs>
+                  <linearGradient id="barGradient" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#34d399" />
+                    <stop offset="100%" stopColor="#3b82f6" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
 
-        {/* 8. Recent Activity Timeline */}
-        <div className="mb-8">
-          <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">⏳ Recent Activity</h2>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 pb-3 border-b border-gray-100 dark:border-gray-700/50 last:border-0">
-                  <div className="text-2xl">{activity.icon}</div>
-                  <div className="flex-1">
-                    <p className="text-gray-800 dark:text-gray-200">{activity.description}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Nutrition distribution</h3>
+                <span className="text-sm text-slate-500 dark:text-slate-400">Macro balance</span>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="relative h-40 w-40 rounded-full bg-[conic-gradient(#10b981_0_35%,#8b5cf6_35%_65%,#f59e0b_65%_85%,#38bdf8_85%_100%)]">
+                  <div className="absolute inset-4 rounded-full bg-white dark:bg-slate-900" />
+                  <div className="absolute inset-0 flex items-center justify-center text-lg font-black text-slate-900 dark:text-white">72%</div>
+                </div>
+                <div className="flex-1 space-y-3">
+                  {nutritionDistribution.map((nutrient) => (
+                    <div key={nutrient.label} className="flex items-center gap-3">
+                      <span className={`h-3 w-3 rounded-full ${nutrient.color}`} />
+                      <span className="flex-1 text-sm text-slate-600 dark:text-slate-300">{nutrient.label}</span>
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{nutrient.value}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.16 }}
+            className="grid gap-6 xl:grid-cols-2"
+          >
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Mood trend</h3>
+                <span className="text-sm text-cyan-600 dark:text-cyan-400">+18% this week</span>
+              </div>
+              <svg viewBox="0 0 520 200" className="h-48 w-full">
+                <path d={moodPath} fill="none" stroke="url(#moodGradient)" strokeWidth="4" strokeLinecap="round" />
+                {moodTrend.map((point, index) => (
+                  <circle key={point.day} cx={55 + index * 72} cy={120 - point.value / 2} r="5" fill="#0ea5e9" />
+                ))}
+                <defs>
+                  <linearGradient id="moodGradient" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0%" stopColor="#22c55e" />
+                    <stop offset="100%" stopColor="#0ea5e9" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Water intake</h3>
+                <span className="text-sm text-sky-600 dark:text-sky-400">Goal: 3.0 L</span>
+              </div>
+              <div className="flex h-48 items-end gap-3">
+                {waterIntake.map((value) => (
+                  <div key={value.label} className="flex flex-1 flex-col items-center gap-2">
+                    <div className="flex w-full items-end justify-center rounded-t-2xl bg-gradient-to-t from-sky-500 to-cyan-300" style={{ height: `${Math.max((value.value / 3) * 130, 30)}px` }} />
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{value.label}</span>
                   </div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.2 }}
+            className="grid gap-6 xl:grid-cols-2"
+          >
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Favorite foods</h3>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                {favoriteFoods.map((food) => (
+                  <div key={food.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                    <div className="text-2xl">{food.emoji}</div>
+                    <div className="mt-2 text-sm font-medium text-slate-700 dark:text-slate-200">{food.name}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Saved diet plans</h3>
+              <div className="mt-4 space-y-3">
+                {savedPlans.map((plan) => (
+                  <div key={plan.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                    <div>
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">{plan.name}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{plan.duration} • {plan.goal}</div>
+                    </div>
+                    <button type="button" className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                      Active
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.24 }}
+            className="grid gap-6 xl:grid-cols-2"
+          >
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Recent activity</h3>
+              <div className="mt-4 space-y-3">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 text-lg">{activity.icon}</div>
+                    <div className="flex-1">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-400">{activity.time}</div>
+                      <div className="mt-1 text-sm text-slate-700 dark:text-slate-200">{activity.text}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Order history</h3>
+              <div className="mt-4 space-y-3">
+                {orderHistory.map((order) => (
+                  <div key={order.id} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/40">
+                    <div>
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">{order.item}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">{order.date}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-slate-800 dark:text-slate-200">{order.amount}</div>
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400">{order.status}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.28 }}
+            className="grid gap-6 xl:grid-cols-3"
+          >
+            {aiInsights.map((insight) => (
+              <div key={insight.id} className="rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900/80">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-xl">{insight.icon}</div>
+                  <div className="text-lg font-bold text-slate-900 dark:text-white">{insight.title}</div>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </div>
+                <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">{insight.text}</p>
+              </div>
+            ))}
+          </motion.section>
 
-        {/* 9. Weekly Meal Plan */}
-        <div className="mb-8">
-          <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">📆 Weekly Meal Plan</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {weeklyMealPlan.map((day) => (
-                <div key={day.day} className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <p className="font-medium text-gray-800 dark:text-white">{day.day}</p>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 list-disc list-inside">
-                    {day.meals.map((meal, idx) => (
-                      <li key={idx}>{meal}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* 10. Today's Health Tips & 11. AI Suggestions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="p-6 bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">💡 Today's Health Tips</h2>
-            <ul className="space-y-3">
-              {healthTips.map((tip) => (
-                <li key={tip.id} className="flex items-start gap-3">
-                  <span className="text-2xl">{tip.icon}</span>
-                  <span className="text-gray-700 dark:text-gray-200">{tip.text}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-
-          <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">🧠 AI Suggestions</h2>
-            <ul className="space-y-3">
-              {aiSuggestions.map((suggestion) => (
-                <li key={suggestion.id} className="flex items-start gap-3">
-                  <span className="text-2xl">💡</span>
-                  <span className="text-gray-700 dark:text-gray-200">{suggestion.text}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </div>
-
-        {/* 12. Disease Risk Prediction */}
-        <div className="mb-8">
-          <Card className="p-6 bg-gradient-to-br from-red-50 to-rose-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">🛡️ Disease Risk Prediction</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {diseaseRisks.map((risk) => (
-                <div key={risk.condition} className="p-4 bg-white/60 dark:bg-gray-800/60 rounded-xl text-center">
-                  <div className="text-3xl">{risk.emoji}</div>
-                  <p className="font-medium text-gray-800 dark:text-white">{risk.condition}</p>
-                  <p className={`text-sm font-bold ${risk.risk === "Low" ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"}`}>
-                    {risk.risk}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* 13. Favourite Foods & 14. Recently Viewed Foods */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">❤️ Favourite Foods</h2>
-            <div className="flex flex-wrap gap-3">
-              {favoriteFoods.map((food) => (
-                <span key={food.id} className="px-4 py-2 bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-200 rounded-full flex items-center gap-2">
-                  <span>{food.emoji}</span> {food.name}
-                </span>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">👀 Recently Viewed</h2>
-            <div className="flex flex-wrap gap-3">
-              {recentlyViewed.map((food) => (
-                <span key={food.id} className="px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full flex items-center gap-2">
-                  <span>{food.emoji}</span> {food.name}
-                </span>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* 15. Water Intake Tracker, 16. Exercise Tracker, 17. Sleep Tracker, 18. Daily Goals */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 text-center">
-            <div className="text-3xl">💧</div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Water Intake</p>
-            <p className="text-xl font-bold text-gray-800 dark:text-white">2.1 / 3.0 L</p>
-          </Card>
-          <Card className="p-4 bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 text-center">
-            <div className="text-3xl">🏃</div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Exercise</p>
-            <p className="text-xl font-bold text-gray-800 dark:text-white">45 min</p>
-          </Card>
-          <Card className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 text-center">
-            <div className="text-3xl">😴</div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Sleep</p>
-            <p className="text-xl font-bold text-gray-800 dark:text-white">7.2 h</p>
-          </Card>
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-700/80 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 text-center">
-            <div className="text-3xl">🎯</div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Daily Goals</p>
-            <p className="text-xl font-bold text-gray-800 dark:text-white">80%</p>
-          </Card>
-        </div>
-
-        {/* 19. Download Report Button, 20. Export PDF Button, 21. Print Button */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Button variant="primary" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
-            ⬇️ Download Report
-          </Button>
-          <Button variant="secondary" className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2">
-            📄 Export PDF
-          </Button>
-          <Button variant="outline" className="border-2 border-gray-400 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-6 py-3 rounded-full flex items-center gap-2">
-            🖨️ Print
-          </Button>
+          <div className="flex justify-center pb-6">
+            <Link href="/ai-insights">
+              <button type="button" className="rounded-full border border-slate-200 bg-slate-50 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200">
+                Open full AI insights
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>
   );
 };
 
+export default DashboardPage;

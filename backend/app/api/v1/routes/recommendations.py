@@ -1,15 +1,12 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
-from datetime import datetime
-import uuid
+﻿from typing import List, Optional
 
-from ..dependencies import get_current_user
-from ...models.food import Food as FoodModel  # hypothetical, but we'll use local dict
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
+
+from app.core.dependencies import get_current_user
 
 router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
-# In-memory data store (for demo)
 FOODS_DB = [
     {
         "id": "1",
@@ -20,7 +17,7 @@ FOODS_DB = [
         "carbs": 20.0,
         "fat": 15.0,
         "fiber": 7.0,
-        "moodTag": "Happy"
+        "moodTag": "Happy",
     },
     {
         "id": "2",
@@ -31,7 +28,7 @@ FOODS_DB = [
         "carbs": 45.0,
         "fat": 8.0,
         "fiber": 8.0,
-        "moodTag": "Energetic"
+        "moodTag": "Energetic",
     },
     {
         "id": "3",
@@ -42,7 +39,7 @@ FOODS_DB = [
         "carbs": 35.0,
         "fat": 18.0,
         "fiber": 6.0,
-        "moodTag": "Satisfied"
+        "moodTag": "Satisfied",
     },
     {
         "id": "4",
@@ -53,7 +50,7 @@ FOODS_DB = [
         "carbs": 30.0,
         "fat": 2.0,
         "fiber": 4.0,
-        "moodTag": "Refreshed"
+        "moodTag": "Refreshed",
     },
     {
         "id": "5",
@@ -64,7 +61,7 @@ FOODS_DB = [
         "carbs": 28.0,
         "fat": 3.0,
         "fiber": 10.0,
-        "moodTag": "Comforted"
+        "moodTag": "Comforted",
     },
     {
         "id": "6",
@@ -75,11 +72,11 @@ FOODS_DB = [
         "carbs": 27.0,
         "fat": 3.0,
         "fiber": 4.0,
-        "moodTag": "Calm"
-    }
+        "moodTag": "Calm",
+    },
 ]
 
-# Response models
+
 class RecommendationResponse(BaseModel):
     id: str
     name: str
@@ -90,44 +87,43 @@ class RecommendationResponse(BaseModel):
     moodTag: str
     reason: str
 
+
 class RecommendationListResponse(BaseModel):
     success: bool
     data: List[RecommendationResponse]
     message: Optional[str] = None
 
+
 @router.get("/", response_model=RecommendationListResponse)
 async def get_recommendations(
     mood: Optional[str] = None,
     limit: int = Query(5, ge=1, le=20),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
-    """
-    Get AI-powered food recommendations based on mood.
-    - **mood**: Filter by mood tag (e.g., Happy, Energetic)
-    - **limit**: Number of recommendations to return (1-20)
-    """
     items = FOODS_DB.copy()
     if mood:
-        items = [f for f in items if f["moodTag"].lower() == mood.lower()]
-    # Limit results and add a reason for each
+        items = [food for food in items if food["moodTag"].lower() == mood.lower()]
+
     recommendations = []
     for food in items[:limit]:
-        reason = f"Recommended for your {food['moodTag']} mood"
-        # If no mood filter, provide a generic reason
-        if not mood:
-            reason = "Personalized recommendation based on your profile"
-        recommendations.append(RecommendationResponse(
-            id=food["id"],
-            name=food["name"],
-            calories=food["calories"],
-            protein=food["protein"],
-            carbs=food["carbs"],
-            fiber=food["fiber"],
-            moodTag=food["moodTag"],
-            reason=reason
-        ))
+        reason = "Personalized recommendation based on your profile"
+        if mood:
+            reason = f"Recommended for your {food['moodTag']} mood"
+        recommendations.append(
+            RecommendationResponse(
+                id=food["id"],
+                name=food["name"],
+                calories=food["calories"],
+                protein=food["protein"],
+                carbs=food["carbs"],
+                fiber=food["fiber"],
+                moodTag=food["moodTag"],
+                reason=reason,
+            )
+        )
+
     return RecommendationListResponse(
         success=True,
         data=recommendations,
-        message=f"Found {len(recommendations)} recommendations"
+        message=f"Found {len(recommendations)} recommendations",
     )

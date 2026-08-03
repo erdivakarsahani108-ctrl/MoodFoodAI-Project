@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, JSON, String, Boolean, func
+﻿from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, func
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -55,7 +55,7 @@ class MoodEvent(Base):
     mood_label = Column(String(50), nullable=False)
     sentiment = Column(String(50), nullable=False)
     confidence = Column(String(10), nullable=False)
-    metadata = Column(JSON, default={})
+    details = Column(JSON, default={})
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="moods")
